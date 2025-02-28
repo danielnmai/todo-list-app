@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { queryClient } from "@/app/page";
+import APIService from "@/services/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import TaskCard from "./TaskCard";
 import { TaskColor } from "./TaskForm";
 import { Badge } from "./ui/badge";
@@ -12,51 +15,45 @@ export type Task = {
   completed: boolean;
 };
 
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    title: "Do leetcode",
-    color: TaskColor.Red,
-    completed: false,
-  },
-  {
-    id: "2",
-    title: "Do web dev (2 hours)",
-    color: TaskColor.Green,
-    completed: false,
-  },
-  {
-    id: "3",
-    title: "Apply for jobs",
-    color: TaskColor.Orange,
-    completed: false,
-  },
-  {
-    id: "4",
-    title:
-      "Read a book Read a book Read a book Read a book Read a book Read a book",
-    color: TaskColor.Blue,
-    completed: true,
-  },
-];
-
 const TaskList = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const API = new APIService();
+
+  const { data: tasks, isError } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: () => API.fetchTasks(),
+  });
+
+  const updateTask = useMutation({
+    mutationFn: (task: Task) => API.updateTask(task),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onError: () => toast.error("Unable to update task. Please try again"),
+  });
+
+  const deleteTask = useMutation({
+    mutationFn: (taskId: string) => API.deleteTask(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onError: () => toast.error("Unable to delete task. Please try again"),
+  });
 
   const handleTaskComplete = (completedTask: Task) => {
-    setTasks(
-      tasks.map((task) => {
-        if (task.id === completedTask.id) {
-          return completedTask;
-        }
-        return task;
-      })
-    );
+    updateTask.mutate(completedTask);
   };
 
   const handleDelete = (id: string) => {
-    console.log("Task deleted", id);
+    deleteTask.mutate(id);
   };
+
+  if (isError) {
+    toast.error("Error loading tasks. Please try again.");
+  }
+
+  if (!tasks) {
+    return;
+  }
 
   return (
     <div className="h-screen w-full mt-12">

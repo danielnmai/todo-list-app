@@ -23,15 +23,15 @@ type TaskFormProps = {
 };
 
 export enum TaskColor {
-  Red = "red",
-  Orange = "orange",
-  Yellow = "yellow",
-  Green = "green",
-  Blue = "blue",
-  Indigo = "indigo",
-  Purple = "purple",
-  Pink = "pink",
-  Brown = "brown",
+  Red = "Red",
+  Orange = "Orange",
+  Yellow = "Yellow",
+  Green = "Green",
+  Blue = "Blue",
+  Indigo = "Indigo",
+  Purple = "Purple",
+  Pink = "Pink",
+  Brown = "Brown",
 }
 
 export const formSchema = z.object({
@@ -59,7 +59,7 @@ const TaskForm = ({ task, mode, onSubmit }: TaskFormProps) => {
   });
 
   const renderColorRadioGroupItem = (color: TaskColor) => {
-    const colorName = `bg-${color} border-${color}`;
+    const colorName = `bg-${color.toLowerCase()} border-${color.toLowerCase()}`;
 
     return (
       <FormItem key={color}>
