@@ -1,5 +1,7 @@
 This is a a Todo app built with Next.JS.
 
+![App home screen](/public/screenshot.png)
+
 ## Getting Started
 
 Install the app dependencies
